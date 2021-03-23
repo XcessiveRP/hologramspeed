@@ -2,6 +2,7 @@ const DisplayRoot = document.getElementById("displayRoot");
 const GearDisplay = document.getElementById("gearDisplay");
 const GearNum = document.getElementById("gearNum");
 const UnitDisplay = document.getElementById("unitDisplay");
+const FuelIndicator = document.getElementById("fuelIndicator");
 const AbsIndicator = document.getElementById("absIndicator");
 const HBrakeIndicator = document.getElementById("hBrakeIndicator");
 const RpmDisplay = document.getElementById("rpmBar");
@@ -70,6 +71,18 @@ window.addEventListener("message", function(ev) {
 		RpmDisplay.style.width = `${(parseFloat(data.rpm) * 100.0).toFixed(2)}%`;
 		GearDisplay.classList.toggle("rpmOverload", (rawRpm * 9) > 7.5);
 	}
+	
+	if (data.fuel != undefined & data.fuelLevel != undefined & data.fuel) {
+		FuelIndicator.classList.remove("hidden");
+		const fuel = Math.round(parseFloat(data.fuelLevel))
+		FuelIndicator.innerText = fuel + "%";
+
+		FuelIndicator.classList.toggle('fuelCritical', fuel <= 15);
+		FuelIndicator.classList.toggle('fuelLow', (15 < fuel <= 30));
+		FuelIndicator.classList.toggle('fuelFull', fuel > 30);
+	} else {
+		FuelIndicator.classList.add("hidden");
+	}
 
 	if (data.hBrake != undefined) HBrakeIndicator.classList.toggle("inactive", data.hBrake == false);
 	
@@ -81,9 +94,9 @@ window.addEventListener("message", function(ev) {
 // Due to loading order, we need to let the resource side know when *we* are ready.
 // Just having the browser "loaded" isn't enough.
 fetch(`https://${document.location.host}/duiIsReady`, {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: JSON.stringify({ok: true})
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json; charset=UTF-8',
+	},
+	body: JSON.stringify({ok: true})
 })

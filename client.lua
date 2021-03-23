@@ -12,6 +12,7 @@ local SettingKey         = string.format("%s:profile", GetCurrentServerEndpoint(
 local DBG                = false -- Enables debug information, not very useful unless you know what you are doing!
 
 -- Variables
+local fuelEnabled    = false -- Show Fuel level from LegacyFuel
 local duiObject      = false -- The DUI object, used for messaging and is destroyed when the resource is stopped
 local duiIsReady     = false -- Set by a callback triggered by DUI once the javascript has fully loaded
 local hologramObject = 0 -- The current DUI anchor. 0 when one does not exist
@@ -219,8 +220,9 @@ CreateThread(function()
 	-- This thread watches for changes to the user's preferred measurement system
 	CreateThread(function()	
 		while true do
-			Wait(1000)
-	
+			Wait(2000)
+
+			fuelEnabled = exports["LegacyFuel"] ~= nil
 			shouldUseMetric = ShouldUseMetricMeasurements()
 	
 			if usingMetric ~= shouldUseMetric and EnsureDuiMessage {useMetric = shouldUseMetric} then
@@ -273,15 +275,22 @@ CreateThread(function()
 
 					-- Until the player is no longer driving this vehicle, update the UI
 					repeat
+						local fuelLevel = 100
 						vehicleSpeed = GetEntitySpeed(currentVehicle)
+						
+						if fuelEnabled then
+							fuelLevel = exports["LegacyFuel"]:GetFuel(currentVehicle)
+						end
 
 						EnsureDuiMessage {
-							display  = displayEnabled and IsVehicleEngineOn(currentVehicle),
-							rpm      = GetVehicleCurrentRpm(currentVehicle),
-							gear     = GetVehicleCurrentGear(currentVehicle),
-							abs      = (GetVehicleWheelSpeed(currentVehicle, 0) == 0.0) and (vehicleSpeed > 0.0),
-							hBrake   = GetVehicleHandbrake(currentVehicle),
-							rawSpeed = vehicleSpeed,
+							display   = displayEnabled and IsVehicleEngineOn(currentVehicle),
+							rpm       = GetVehicleCurrentRpm(currentVehicle),
+							gear      = GetVehicleCurrentGear(currentVehicle),
+							abs       = (GetVehicleWheelSpeed(currentVehicle, 0) == 0.0) and (vehicleSpeed > 0.0),
+							hBrake    = GetVehicleHandbrake(currentVehicle),
+							rawSpeed  = vehicleSpeed,
+							fuel      = fuelEnabled,
+							fuelLevel = fuelLevel,
 						}
 
 						-- Wait for the next frame or half a second if we aren't displaying

@@ -27,6 +27,18 @@
 	src: url("../fonts/digital.ttf");
 }
 
+@keyframes fade {
+	from { opacity: 1.0; }
+	50% { opacity: 0.5; }
+	to { opacity: 1.0; }
+}
+
+@-webkit-keyframes fade {
+	from { opacity: 1.0; }
+	50% { opacity: 0.5; }
+	to { opacity: 1.0; }
+}
+
 :root {
 	--text-color: rgba(255, 255, 255, 0.95);
 	--text-inactive: rgba(193, 193, 193, 0.5);
@@ -40,6 +52,10 @@
 
 	--rpm-background: rgba(193, 193, 193, 0.5);
 	--rpm-fill: rgba(255, 255, 255, 0.85);
+	
+	--fuel-full: rgba(255, 255, 255, 0.95);
+	--fuel-low: rgba(255, 255, 0, 0.95);
+	--fuel-critical: rgba(255, 0, 0, 0.95);
 }
 
 .hidden {
@@ -49,6 +65,20 @@
 
 .inactive {
 	color: var(--text-inactive);
+}
+
+.fuelCritical {
+	color: var(--fuel-critical) !important;
+	animation:fade 1000ms infinite;
+	-webkit-animation:fade 1000ms infinite;
+}
+
+.fuelLow {
+	color: var(--fuel-low) !important;
+}
+
+.fuelFull {
+	color: var(--fuel-full) !important;
 }
 
 #displayRoot {
@@ -115,6 +145,19 @@
 	font-family: 'digital';
 }
 
+#fuelContainer {
+	position: absolute;
+	left: 170px;
+	bottom: -3px;
+	font-family: 'digital';
+}
+
+#fuelIndicator {
+	display: inline-block;
+	width: 1.8em;
+	text-align: right;
+}
+
 #absContainer {
 	position: absolute;
 	left: 180px;
@@ -141,3 +184,5 @@
 	height: 100%;
 	background: var(--rpm-fill);
 }
+
+
