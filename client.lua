@@ -157,6 +157,12 @@ AddEventHandler('HologramSpeed:SetTheme', function(theme)
 	SetTheme(theme)
 end)
 
+AddEventHandler('onClientResourceStop', function(resource)
+    if resource == "LegacyFuel" then
+        fuelEnabled = false
+    end
+end)
+
 -- Register command
 
 RegisterCommand("hsp", function(_, args)	
@@ -222,7 +228,7 @@ CreateThread(function()
 		while true do
 			Wait(2000)
 
-			fuelEnabled = exports["LegacyFuel"] ~= nil
+			fuelEnabled = GetResourceState("LegacyFuel") == "started"
 			shouldUseMetric = ShouldUseMetricMeasurements()
 	
 			if usingMetric ~= shouldUseMetric and EnsureDuiMessage {useMetric = shouldUseMetric} then
@@ -278,8 +284,8 @@ CreateThread(function()
 						local fuelLevel = 100
 						vehicleSpeed = GetEntitySpeed(currentVehicle)
 						
-						if fuelEnabled then
-							fuelLevel = exports["LegacyFuel"]:GetFuel(currentVehicle)
+                        if fuelEnabled then
+                            fuelLevel = exports.LegacyFuel:GetFuel(currentVehicle)
 						end
 
 						EnsureDuiMessage {
